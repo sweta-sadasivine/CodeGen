@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     Button,
     Container,
@@ -7,9 +7,10 @@ import {
     Toolbar,
     Typography,
     TextField,
-    Grid
+    Grid,
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import FileDownload from "js-file-download";
 import axios from 'axios';
 
 
@@ -24,20 +25,24 @@ const theme = createTheme({
 function Home() {
 
     const [replaceJson, setReplaceJson] = useState();
-    const [filename, setFilename] = useState('');
+    const [outFilename, setFilename] = useState('');
 
     const onSubmit = async (event) => {
         const request = {};
         request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
-        request['outputFileName'] = filename;
+        request['outputFileName'] = outFilename;
         console.log(request);
 
-        await axios.post('http://localhost:5000/codegenerator/api/generate', request)
-        .then(() => {
-            console.log(200);
+        // Send a POST request
+        axios({
+            method: 'post',
+            url: 'http://localhost:5000/codegenerator/api/generate',
+            data: request,
+            responseType: 'blob'
         })
-        .catch((error) => {
-            console.log("Error");
+        .then((res)=> {
+            FileDownload(res.data, `${outFilename}.zip`)
+        .catch(error => console.log(error))
         });
     }
 
@@ -84,7 +89,7 @@ function Home() {
                             color='secondary'
                             multiline
                             fullWidth
-                            onChange={(e) => setReplaceJson(e.target.value)} 
+                            onChange={(e) => setReplaceJson(e.target.value)}
                             value={replaceJson}
                         />
                     </Grid>
@@ -110,8 +115,8 @@ function Home() {
                             required
                             sx={{ flexGrow: 1 }}
                             color='secondary'
-                            onChange={(e) => setFilename(e.target.value)} 
-                            value={filename}
+                            onChange={(e) => setFilename(e.target.value)}
+                            value={outFilename}
                         />
                     </Grid>
                 </Grid>

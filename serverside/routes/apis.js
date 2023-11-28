@@ -17,7 +17,7 @@ router.post('/generate', async (req, res) => {
         res.set('Content-Type', 'application/octet-stream');
         res.set('Content-Disposition', `attachment; filename=${outFileName}.zip`);
         res.set('Content-Length', file.length);
-        res.send(file);
+        res.download(`./converted/${outFileName}.zip`);
     } catch (error) {
         console.log(error)
         res.status(400).json({ error: "not my propblem" })
