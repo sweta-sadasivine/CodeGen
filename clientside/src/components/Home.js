@@ -1,4 +1,6 @@
+import axios from 'axios';
 import React, { useState } from 'react';
+import FileDownload from "js-file-download";
 import {
     Button,
     Container,
@@ -10,8 +12,7 @@ import {
     Grid,
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import FileDownload from "js-file-download";
-import axios from 'axios';
+
 
 
 const theme = createTheme({
@@ -24,6 +25,7 @@ const theme = createTheme({
 
 function Home() {
 
+    //Defining the the states to be used by UI
     const [replaceJson, setReplaceJson] = useState();
     const [outFilename, setFilename] = useState('');
 
@@ -32,7 +34,7 @@ function Home() {
         request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
         request['outputFileName'] = outFilename;
 
-        // Send a POST request
+        //Sending a POST request
         axios({
             method: 'post',
             url: 'http://localhost:5000/codegenerator/api/generate',
@@ -40,7 +42,8 @@ function Home() {
             responseType: 'blob'
         })
         .then((res)=> {
-            FileDownload(res.data, `${outFilename}.zip`)
+            window.location.reload();
+            FileDownload(res.data, `${outFilename}.zip`);
         })
         .catch(error => console.log('Error'));
     }
