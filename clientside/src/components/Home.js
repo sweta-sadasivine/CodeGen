@@ -29,7 +29,7 @@ function Home() {
     const onSubmit = async (event) => {
         const request = {};
         request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
-        request['Output File Name'] = filename;
+        request['outputFileName'] = filename;
         console.log(request);
 
         await axios.post('http://localhost:5000/codegenerator/api/generate', request)
