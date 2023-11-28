@@ -10,6 +10,7 @@ import {
     Grid
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
 
 
 const theme = createTheme({
@@ -25,9 +26,19 @@ function Home() {
     const [replaceJson, setReplaceJson] = useState();
     const [filename, setFilename] = useState('');
 
-    const onSubmit = (event) => {
-        console.log(replaceJson);
-        console.log(filename);
+    const onSubmit = async (event) => {
+        const request = {};
+        request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
+        request['Output File Name'] = filename;
+        console.log(request);
+
+        await axios.post('http://localhost:5000/codegenerator/api/generate', request)
+        .then(() => {
+            console.log(200);
+        })
+        .catch((error) => {
+            console.log("Error");
+        });
     }
 
     return (
