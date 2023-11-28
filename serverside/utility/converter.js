@@ -12,6 +12,7 @@ const template = require('../templates');
  * @param {*} replaceJson : User inputs in the defined JSON format
  */
 async function converter(replaceJson) {
+    let file;
     try {
 
         //Initializing the global variables
@@ -30,13 +31,10 @@ async function converter(replaceJson) {
         //Adding/Updating list of files to Index.js
         addFilesToIndex(fileList);
 
-        //Converting the input to JSON
-        const modal = JSON.parse(replaceJson);
-
         //Creating the folders according to the template folder structure
         create_folder_if_not_exists(folderList);
 
-        const data = modal["replaceJson"];
+        const data = replaceJson["replaceJson"];
         let counter = 1;
         //Convert each template file, present in templates folder, to corresponding JS file
         fileList.forEach((file) => {
@@ -50,10 +48,12 @@ async function converter(replaceJson) {
         });
 
         //Adding all the files and folder created to a zip file
-        await zipFolderContent(modal['Output File Name']);
+        file = await zipFolderContent(replaceJson['outputFileName']);
     } catch (e) {
         console.log("Error:- ", e);
     }
+
+    return file;
 }
 
 /**
@@ -151,6 +151,7 @@ async function zipFolderContent(outFileName) {
     zip.addLocalFolder(in_path);
     zip.writeZip(out_path);
     console.log(`Created ${out_path} successfully`);
+    return zip.toBuffer();
 }
 
 

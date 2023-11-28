@@ -1,14 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const codeGen = require('../utility/converter')
+const admZip = require("adm-zip");
+const codeGen = require('../utility/converter');
 
-router.post('/generate', async(req, res) => {
-    try{
-        codeGen.converter(JSON.stringify(req.body));
-        res.status(200).json({message: "files and folders created"})
-    }catch(error){
+router.post('/generate', async (req, res) => {
+    try {
+        //Converting the request body to JSON 
+        const reqBody = JSON.parse(JSON.stringify(req.body));
+        //Fetching the download file name
+        const outFileName = reqBody.outputFileName;
+        //Calling method to generate the file and folders
+        const file = await codeGen.converter(reqBody);
+
+        //Generating response for the api
+        res.status(200);
+        res.set('Content-Type', 'application/octet-stream');
+        res.set('Content-Disposition', `attachment; filename=${outFileName}.zip`);
+        res.set('Content-Length', file.length);
+        res.send(file);
+    } catch (error) {
         console.log(error)
-        res.status(400).json({error: "not my propblem"})
+        res.status(400).json({ error: "not my propblem" })
     }
 })
 
