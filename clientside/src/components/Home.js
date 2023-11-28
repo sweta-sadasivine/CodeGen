@@ -31,7 +31,6 @@ function Home() {
         const request = {};
         request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
         request['outputFileName'] = outFilename;
-        console.log(request);
 
         // Send a POST request
         axios({
@@ -42,8 +41,8 @@ function Home() {
         })
         .then((res)=> {
             FileDownload(res.data, `${outFilename}.zip`)
-        .catch(error => console.log(error))
-        });
+        })
+        .catch(error => console.log('Error'));
     }
 
     return (

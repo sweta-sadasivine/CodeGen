@@ -20,7 +20,7 @@ router.post('/generate', async (req, res) => {
         res.download(`./converted/${outFileName}.zip`);
     } catch (error) {
         console.log(error)
-        res.status(400).json({ error: "not my propblem" })
+        res.status(400).json({ error: "Error" })
     }
 })
 
