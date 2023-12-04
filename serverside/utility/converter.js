@@ -32,6 +32,7 @@ async function converter(replaceJson) {
         addFilesToIndex(fileList);
 
         //Creating the folders according to the template folder structure
+        folderList.splice(0, 0, './templates');
         create_folder_if_not_exists(folderList);
 
         const data = replaceJson["replaceJson"];
