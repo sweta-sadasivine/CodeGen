@@ -11,6 +11,7 @@ import {
     TextField,
     Grid,
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
@@ -28,8 +29,15 @@ function Home() {
     //Defining the the states to be used by UI
     const [replaceJson, setReplaceJson] = useState();
     const [outFilename, setFilename] = useState('');
+    const [fileUrl, setFileUrl] = useState(null);
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+
+  };
 
     const onSubmit = async (event) => {
+        event.preventDefault()
         const request = {};
         request['replaceJson'] = JSON.parse(replaceJson.replaceAll(/\\n+|\\t+/gm, ''));
         request['outputFileName'] = outFilename;
@@ -37,15 +45,15 @@ function Home() {
         //Sending a POST request
         axios({
             method: 'post',
-            url: 'http://localhost:5000/codegenerator/api/generate',
+            url: `http://localhost:5000/codegenerator/api/generate`,
             data: request,
             responseType: 'blob'
         })
-        .then((res)=> {
-            window.location.reload();
-            FileDownload(res.data, `${outFilename}.zip`);
-        })
-        .catch(error => console.log('Error'));
+            .then((res) => {
+                window.location.reload();
+                FileDownload(res.data, `${outFilename}.zip`);
+            })
+            .catch(error => console.log('Error'));
     }
 
     return (
@@ -80,7 +88,7 @@ function Home() {
                 </AppBar>
                 <br />
                 <Grid container alignItems="flex-end" >
-                    <Grid item xs={8} sm={8}>
+                    <Grid item xs={12} sm={8}>
                         <TextField
                             id="json"
                             label="JSON"
@@ -105,10 +113,14 @@ function Home() {
                         display: 'flex',
                         flexDirection: 'row',
                         flex: 1,
-                        justifyContent: 'flex-start',
+                        justifyContent: 'space-evenly',
                         pt: 3
                     }}
                 >
+                    <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />}>
+                        Upload
+                        <input hidden accept="zip/*" type="file" onChange={handleFileUpload} />
+                    </Button>
                     <Grid item xs={6} sm={3}>
                         <TextField
                             id="filename"
