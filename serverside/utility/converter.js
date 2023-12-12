@@ -4,6 +4,7 @@ const AdmZip = require("adm-zip");
 
 let fileList;
 let folderList;
+let prefix = '';
 const template = require('../templates');
 
 /**
@@ -31,23 +32,29 @@ async function converter(replaceJson) {
         //Adding/Updating list of files to Index.js
         addFilesToIndex(fileList);
 
-        //Creating the folders according to the template folder structure
         folderList.splice(0, 0, './templates');
-        create_folder_if_not_exists(folderList);
 
-        const data = replaceJson["replaceJson"];
-        let counter = 1;
-        //Convert each template file, present in templates folder, to corresponding JS file
-        fileList.forEach((file) => {
-            let path = file;
-            //Making sure the JS files gets created in the 'Converted' folder
-            path = path.replaceAll(/\.\/templates/g, './converted/templates')
-            //Dynamically converting the files
-            let fileContent = `template.file${counter}(data)`;
-            writeToFile(`${path}`, eval(fileContent).replaceAll(/\\`/g, '`').replaceAll(/\\\$/g, '$'));
-            counter++;
+        const dataArray = replaceJson["replaceJson"];
+
+        dataArray.forEach((data) => {
+
+            prefix = data["prefix"] === undefined ? 1 : data["prefix"];
+            //Creating the folders according to the template folder structure
+            create_folder_if_not_exists(folderList);
+
+            let counter = 1;
+            //Convert each template file, present in templates folder, to corresponding JS file
+            fileList.forEach((file) => {
+                let path = file;
+                //Making sure the JS files gets created in the 'Converted' folder
+                path = prefix === '' ? path.replaceAll(/\.\/templates/g, './converted/templates') :
+                                    path.replaceAll(/\.\/templates/g, `./converted/templates/${prefix}`)
+                //Dynamically converting the files
+                let fileContent = `template.file${counter}(data)`;
+                writeToFile(`${path}`, eval(fileContent).replaceAll(/\\`/g, '`').replaceAll(/\\\$/g, '$'));
+                counter++;
+            });
         });
-
         //Adding all the files and folder created to a zip file
         file = await zipFolderContent(replaceJson['outputFileName']);
     } catch (e) {
@@ -67,7 +74,8 @@ function create_folder_if_not_exists(folders) {
 
     folders.forEach((folder) => {
         //Making sure all the folders are getting created in converted folder only
-        folder = folder.replaceAll(/\.\/templates/g, '/converted/templates');
+        folder = prefix === '' ? folder.replaceAll(/\.\/templates/g, '/converted/templates') :
+            folder.replaceAll(/\.\/templates/g, `/converted/templates/${prefix}`);
         //Creating folders
         folder.split("/").reduce((parentDir, childDir) => {
             const curDir = path.resolve(parentDir, childDir);
